@@ -8,7 +8,7 @@ import altair as alt
 st.title("Detecção de Discurso de Ódio e Preconceito nas Redes")
 st.sidebar.image('tera.png')
 
-data = pd.read_csv(r"C:\Users\daniela.nomura_ifood\projeto_tera-env\group_info_df.csv") #path folder of the data file
+data = pd.read_csv(r"group_info_df.csv") #path folder of the data file
 
 # Crie um espaço reservado para o slider de datas
 slider_placeholder = st.empty()
