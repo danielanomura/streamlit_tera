@@ -8,7 +8,7 @@ import altair as alt
 st.title("Detecção de Discurso de Ódio e Preconceito nas Redes")
 st.sidebar.image('tera.png')
 
-data = pd.read_csv(r"group_info_df.csv") #path folder of the data file
+data = pd.read_csv(r"group_info_df_v2.csv") #path folder of the data file
 
 # Crie um espaço reservado para o slider de datas
 slider_placeholder = st.empty()
@@ -46,9 +46,19 @@ filtered_df = df[((df["DS_GENERO"].isin(selected_gen))
                   & (df["DS_GRAU_INSTRUCAO"].isin(selected_esc)))]
 
 filtered_df['is_offensive'] = filtered_df['class_label'].astype(int)  
+filtered_df['qtt_offensive'] = (filtered_df['is_offensive'])*(filtered_df['id'])
 
-ofensivo = sum(1 for item in filtered_df['class_label'] if item==True)
-candidatos = sum(1 for item in filtered_df['user_is_candidate'] if item==True)
+
+ofensivo = filtered_df[filtered_df['is_offensive']==1]['id'].sum()
+posts = filtered_df[filtered_df['is_reply']==0]['id'].sum()
+post_ofensivo = filtered_df.loc[(filtered_df['is_reply']==0) & (filtered_df['is_offensive']==1), 'id'].sum()
+
+respostas = filtered_df[filtered_df['is_reply']==1]['id'].sum()
+respostas_ofensivo = filtered_df.loc[(filtered_df['is_reply']==1) & (filtered_df['is_offensive']==1), 'id'].sum()
+#filtered_df[filtered_df['is_reply']==0 & filtered_df['is_offensive']==1]['id'].sum()
+#ofensivo = sum(df.get(filtered_df['id']) for item in filtered_df['class_label'] if item==True)
+
+candidatos = filtered_df[filtered_df['user_is_candidate']==1]['id'].sum()
 
 # create two columns
 kpi1,kpi2, kpi3 = st.columns(3)
@@ -59,17 +69,38 @@ kpi1.metric(
 )
 
 kpi2.metric(
-    label="Mensagens de Candidatos",
+    label="Mensagens de candidatos",
     value=candidatos
+    
 )
 
 kpi3.metric(
-    label="% de Mensagens ofensivas",
-    value=round(100*((ofensivo)/(filtered_df['id'].sum())),2),
+    label="Mensagens de ódio",
+    value=ofensivo
 )
 
-graf = (filtered_df.groupby('day',as_index=False).agg({'id':sum,'is_offensive':sum})        )
-graf['perc_of']=round(100*(graf['is_offensive']/graf['id']),2)
+kpi4,kpi5, kpi6 = st.columns(3)
+
+kpi4.metric(
+    label="% de Mensagens de ódio",
+    value=round(100*((ofensivo)/(filtered_df['id'].sum())),2)
+    
+)
+
+kpi5.metric(
+    label="% Mensagens de ódio postadas",
+    value= round(100*((post_ofensivo)/(posts)),2)
+)
+
+kpi6.metric(
+    label="% Mensagens de ódio nas respostas",
+    value=round(100*((respostas_ofensivo)/(respostas)),2)
+)
+
+graf = (filtered_df.groupby('day',as_index=False).agg({'id':sum,'qtt_offensive':sum}) 
+       )
+
+graf['perc_of']=round(100*(graf['qtt_offensive']/graf['id']),2)
 
 graf_layer=(
    alt.Chart(graf).mark_bar().encode(
