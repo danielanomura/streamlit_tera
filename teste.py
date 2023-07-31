@@ -40,7 +40,15 @@ selected_raca = st.sidebar.multiselect('Selecione a Cor/Raça dos(as) Candidatos
 options_esc = df['DS_GRAU_INSTRUCAO'].unique().tolist()
 selected_esc = st.sidebar.multiselect('Selecione o Grau de Escolaridade dos(as) Candidatos(as)',options_esc)
 
+if not selected_gen:
+    selected_gen = ['FEMININO', 'MASCULINO']
 
+if not selected_raca:
+    selected_raca = ['PARDA', 'INDÍGENA', 'PRETA', 'BRANCA']
+
+if not selected_esc:
+    selected_esc = ['ENSINO FUNDAMENTAL INCOMPLETO', 'SUPERIOR INCOMPLETO', 'SUPERIOR COMPLETO']
+ 
 filtered_df = df[((df["DS_GENERO"].isin(selected_gen)) 
                   & (df["DS_COR_RACA"].isin(selected_raca))
                   & (df["DS_GRAU_INSTRUCAO"].isin(selected_esc)))]
