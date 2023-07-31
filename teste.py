@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import altair as alt
 
 
-st.title("Detecção de Discurso de Ódio e Preconceito nas Redes")
+st.title("Detecção de Discurso de Ódio e Viéses nas Redes")
 st.sidebar.image('tera.png')
 
 data = pd.read_csv(r"group_info_df_v2.csv") #path folder of the data file
